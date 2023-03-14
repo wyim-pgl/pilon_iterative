@@ -110,7 +110,7 @@ def main():
 
     for input_path in [args.r1, args.r1, args.unpaired, args.fasta_path]:
         assert os.path.isfile(input_path)
-    assert not os.path.isdir(args.outdir)
+     os.makedirs(args.outdir, exist_ok=True)
 
     last_fasta = args.fasta_path
     changes = list()
