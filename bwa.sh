@@ -9,10 +9,14 @@ threads=$6
 
 mkdir -p $outdir
 
-bwa index $fasta
+#bwa index $fasta
 
-bwa mem -t $threads $fasta $r1 $r2 > $outdir"/aln-pe.sam"
-bwa mem -t $threads $fasta $unpaired > $outdir"/aln-se.sam"
+minimap2 -ax sr -F 800 -t $threads $fasta $unpaired > $outdir"/aln-se.sam"
+
+minimap2 -ax sr -F 800 -t $threads $fasta $r1 $r2 > $outdir"/aln-pe.sam"
+
+#bwa mem -t $threads $fasta $r1 $r2 > $outdir"/aln-pe.sam"
+#bwa mem -t $threads $fasta $unpaired > $outdir"/aln-se.sam"
 
 sam_to_bam.sh $outdir"/aln-pe.sam" $threads
 sam_to_bam.sh $outdir"/aln-se.sam" $threads

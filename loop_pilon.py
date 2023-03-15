@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Author:  Rachel Ehrlich
 
 from subprocess import call
@@ -108,16 +108,17 @@ def parse_changes(log_path, iteration_num):
 def main():
     args = make_args()
 
-    for input_path in [args.r1, args.r1, args.unpaired, args.fasta_path]:
+    for input_path in [args.r1, args.r2, args.unpaired, args.fasta_path]:
         assert os.path.isfile(input_path)
-     os.makedirs(args.outdir, exist_ok=True)
+#    assert not os.path.isdir(args.outdir)
+        os.makedirs(args.outdir, exist_ok=True)
 
     last_fasta = args.fasta_path
     changes = list()
     for iteration_num in range(1, args.max_iterations + 1):
         outdir = args.outdir + '/pilon_' + str(iteration_num)
 
-        cmd = ['bwa.sh', last_fasta, args.r1, args.r1, args.unpaired, outdir,
+        cmd = ['bwa.sh', last_fasta, args.r1, args.r2, args.unpaired, outdir,
                str(args.threads)]
         call(cmd)
         last_fasta = outdir + '/pilon/pilon.fasta'
@@ -134,8 +135,13 @@ def main():
 
         if iteration_changes:
             changes.extend(iteration_changes)
-        else:
-            break
+
+    if not changes:
+        print("Error: No changes found in any pilon iteration")
+        return
+
+
+
 
     changes = pd.concat(changes, axis=1).T.sort_values(['pilon_num', 'variant',
                                                         'size_change'])
